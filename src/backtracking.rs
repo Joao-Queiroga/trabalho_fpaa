@@ -37,6 +37,7 @@ fn distribuir_rotas(
             melhor_metrica = melhor_metrica.min(metrica);
         }
 
+        // poda
         if metrica_atual <= melhor_metrica {
             melhores_distribuicoes.push(distribuicao_atual.clone());
         }
