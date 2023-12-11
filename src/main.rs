@@ -1,5 +1,10 @@
-use std::io;
+mod backtracking;
+mod gerador;
+mod programacao_dinamica;
+
+use gerador::geracao_de_rotas;
 
 fn main() {
-    println!("Hello, world!");
+    let rotas = geracao_de_rotas(5, 10, 0.5);
+    println!("{rotas:?}");
 }
