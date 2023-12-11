@@ -2,9 +2,38 @@ mod backtracking;
 mod gerador;
 mod programacao_dinamica;
 
-use gerador::geracao_de_rotas;
+use std::io;
 
 fn main() {
-    let rotas = geracao_de_rotas(5, 10, 0.5);
-    println!("{rotas:?}");
+    println!("Escolha o que quer executar:");
+    println!("1 - Backtracking");
+    println!("2 - Programação Dinâmica");
+    println!("0 - Sair");
+    loop {
+        let mut input = String::new();
+        println!("Digite a opção desejada:");
+        if io::stdin().read_line(&mut input).is_err() {
+            println!("Erro ao ler entrada");
+            continue;
+        }
+        if let Ok(x) = input.trim().parse::<u8>() {
+            match x {
+                1 => {
+                    backtracking::backtracking();
+                }
+                2 => {
+                    programacao_dinamica::programacao_dinamica();
+                }
+                0 => {
+                    println!("Saindo...");
+                    break;
+                }
+                _ => {
+                    println!("Entrada inválida");
+                }
+            }
+        } else {
+            println!("Entrada inválida");
+        }
+    }
 }
