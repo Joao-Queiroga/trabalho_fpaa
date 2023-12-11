@@ -1,7 +1,7 @@
 use rand::Rng;
 use std::vec::Vec;
 
-pub fn geracao_de_rotas(quant_rotas: i32, tam_conjunto: i32, dispersao: f64) -> Vec<Vec<i32>> {
+pub fn gerador_de_rotas(quant_rotas: i32, tam_conjunto: usize, dispersao: f64) -> Vec<Vec<i32>> {
     let tam_base = 13;
     let tam_max = (tam_base as f64 * (1.0 + dispersao)) as i32;
 
