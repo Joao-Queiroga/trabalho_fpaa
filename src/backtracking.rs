@@ -1,8 +1,3 @@
-pub fn backtracking() {
-    println!("Executando Backtracking");
-    println!("Tamanho máximo do conjunto: {}", testar_tempo_execucao());
-}
-
 use super::gerador::gerador_de_rotas;
 use std::time::{Duration, Instant};
 
@@ -10,7 +5,7 @@ fn calcular_total(rota: &[i32]) -> i32 {
     rota.iter().sum()
 }
 
-fn distribuir_rotas(
+fn distribuir_rotas_recursivo(
     rotas: &[i32],
     num_caminhoes: usize,
     caminhao_atual: usize,
@@ -18,52 +13,66 @@ fn distribuir_rotas(
     melhores_distribuicoes: &mut Vec<Vec<Vec<i32>>>,
 ) {
     if caminhao_atual == num_caminhoes {
-        let mut metrica_atual = 0;
-        for i in 1..num_caminhoes {
-            let diferenca = (calcular_total(&distribuicao_atual[i - 1])
-                - calcular_total(&distribuicao_atual[i]))
-            .abs();
-            metrica_atual += diferenca;
-        }
-
-        let mut melhor_metrica = std::i32::MAX;
-        for distribuicao in melhores_distribuicoes.iter() {
-            let mut metrica = 0;
+        if distribuicao_atual.iter().all(|caminhao| {
+            calcular_total(caminhao) == calcular_total(rotas) / num_caminhoes as i32
+        }) {
+            let mut metrica_atual = 0;
             for i in 1..num_caminhoes {
-                let diferenca =
-                    (calcular_total(&distribuicao[i - 1]) - calcular_total(&distribuicao[i])).abs();
-                metrica += diferenca;
+                if i < distribuicao_atual.len() {
+                    let diferenca = (calcular_total(&distribuicao_atual[i - 1])
+                        - calcular_total(&distribuicao_atual[i]))
+                    .abs();
+                    metrica_atual += diferenca;
+                }
             }
-            melhor_metrica = melhor_metrica.min(metrica);
-        }
 
-        // poda
-        if metrica_atual <= melhor_metrica {
-            melhores_distribuicoes.push(distribuicao_atual.clone());
+            let mut melhor_metrica = std::i32::MAX;
+            for distribuicao in melhores_distribuicoes.iter() {
+                let mut metrica = 0;
+                for i in 1..num_caminhoes {
+                    if i < distribuicao.len() {
+                        let diferenca = (calcular_total(&distribuicao[i - 1])
+                            - calcular_total(&distribuicao[i]))
+                        .abs();
+                        metrica += diferenca;
+                    }
+                }
+                melhor_metrica = melhor_metrica.min(metrica);
+            }
+
+            // Poda
+            if metrica_atual <= melhor_metrica {
+                let distribuicao_clone = distribuicao_atual.to_vec();
+                melhores_distribuicoes.push(distribuicao_clone);
+            }
+            return;
         }
-        return;
     }
 
-    for rota in rotas.iter().cloned() {
-        distribuicao_atual[caminhao_atual].push(rota);
-        distribuir_rotas(
-            rotas,
-            num_caminhoes,
-            caminhao_atual + 1,
-            distribuicao_atual,
-            melhores_distribuicoes,
-        );
-        distribuicao_atual[caminhao_atual].pop();
+    for &rota in rotas.iter() {
+        if caminhao_atual < distribuicao_atual.len()
+            && distribuicao_atual[caminhao_atual].iter().sum::<i32>() + rota
+                <= calcular_total(rotas) / num_caminhoes as i32
+        {
+            distribuicao_atual[caminhao_atual].push(rota);
+            distribuir_rotas_recursivo(
+                rotas,
+                num_caminhoes,
+                caminhao_atual + 1,
+                distribuicao_atual,
+                melhores_distribuicoes,
+            );
+            distribuicao_atual[caminhao_atual].pop();
+        }
     }
 }
 
-fn encontrar_melhor_distribuicao(rotas: Vec<Vec<i32>>, num_caminhoes: usize) -> Vec<Vec<Vec<i32>>> {
-    let rotas_flattened: Vec<i32> = rotas.into_iter().flatten().collect();
+pub fn distribuir_rotas(rotas: &[i32], num_caminhoes: usize) -> Vec<Vec<Vec<i32>>> {
     let mut melhores_distribuicoes = Vec::new();
     let mut distribuicao_atual = vec![vec![]; num_caminhoes];
 
-    distribuir_rotas(
-        &rotas_flattened,
+    distribuir_rotas_recursivo(
+        rotas,
         num_caminhoes,
         0,
         &mut distribuicao_atual,
@@ -73,18 +82,20 @@ fn encontrar_melhor_distribuicao(rotas: Vec<Vec<i32>>, num_caminhoes: usize) -> 
     melhores_distribuicoes
 }
 
-fn testar_tempo_execucao() -> usize {
-    let mut tamanho_conjunto: usize = 6;
+pub fn encontrar_melhor_distribuicao(rotas: &[i32], num_caminhoes: usize) -> Vec<Vec<Vec<i32>>> {
+    distribuir_rotas(rotas, num_caminhoes)
+}
+
+pub fn testar_tempo_execucao() -> usize {
+    let mut quant_rotas: i32 = 6;
     let tempo_limite = Duration::from_secs(30);
 
     loop {
         let mut tempos_execucao = Vec::new();
 
-        for _ in 0..10 {
-            let rotas_aleatorias: Vec<Vec<i32>> = gerador_de_rotas(3, tamanho_conjunto, 0.5);
-
+        for rotas in gerador_de_rotas(quant_rotas, 10, 0.5) {
             let inicio = Instant::now();
-            let _melhor_distribuicao = encontrar_melhor_distribuicao(rotas_aleatorias, 3);
+            let _melhor_distribuicao = encontrar_melhor_distribuicao(&rotas, 3);
             let duracao = inicio.elapsed();
 
             tempos_execucao.push(duracao);
@@ -97,8 +108,8 @@ fn testar_tempo_execucao() -> usize {
             break;
         }
 
-        tamanho_conjunto += 1;
+        quant_rotas += 1;
     }
 
-    tamanho_conjunto
+    quant_rotas as usize
 }
