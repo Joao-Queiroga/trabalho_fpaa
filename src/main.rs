@@ -1,3 +1,5 @@
+use crate::gerador::gerador_de_rotas;
+
 mod backtracking;
 mod gerador;
 mod programacao_dinamica;
@@ -18,7 +20,10 @@ fn main() {
 
         match input.trim().parse::<u8>() {
             Ok(1) => {
-                backtracking::testar_tempo_execucao();
+                let rotas = gerador_de_rotas(6, 1, 0.5);
+                println!("{rotas:?}");
+                let melhores = backtracking::backtracking(&rotas[0], 3);
+                println!("{melhores:?}");
             }
             Ok(2) => programacao_dinamica::programacao_dinamica(),
             Ok(0) => {
