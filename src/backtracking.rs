@@ -12,41 +12,41 @@ fn distribuir_rotas_recursivo(
     distribuicao_atual: &mut Vec<Vec<i32>>,
     melhores_distribuicoes: &mut Vec<Vec<Vec<i32>>>,
 ) {
-    if caminhao_atual == num_caminhoes {
-        if distribuicao_atual.iter().all(|caminhao| {
+    if caminhao_atual == num_caminhoes
+        && distribuicao_atual.iter().all(|caminhao| {
             calcular_total(caminhao) == calcular_total(rotas) / num_caminhoes as i32
-        }) {
-            let mut metrica_atual = 0;
-            for i in 1..num_caminhoes {
-                if i < distribuicao_atual.len() {
-                    let diferenca = (calcular_total(&distribuicao_atual[i - 1])
-                        - calcular_total(&distribuicao_atual[i]))
-                    .abs();
-                    metrica_atual += diferenca;
-                }
+        })
+    {
+        let mut metrica_atual = 0;
+        for i in 1..num_caminhoes {
+            if i < distribuicao_atual.len() {
+                let diferenca = (calcular_total(&distribuicao_atual[i - 1])
+                    - calcular_total(&distribuicao_atual[i]))
+                .abs();
+                metrica_atual += diferenca;
             }
-
-            let mut melhor_metrica = std::i32::MAX;
-            for distribuicao in melhores_distribuicoes.iter() {
-                let mut metrica = 0;
-                for i in 1..num_caminhoes {
-                    if i < distribuicao.len() {
-                        let diferenca = (calcular_total(&distribuicao[i - 1])
-                            - calcular_total(&distribuicao[i]))
-                        .abs();
-                        metrica += diferenca;
-                    }
-                }
-                melhor_metrica = melhor_metrica.min(metrica);
-            }
-
-            // Poda
-            if metrica_atual <= melhor_metrica {
-                let distribuicao_clone = distribuicao_atual.to_vec();
-                melhores_distribuicoes.push(distribuicao_clone);
-            }
-            return;
         }
+
+        let mut melhor_metrica = std::i32::MAX;
+        for distribuicao in melhores_distribuicoes.iter() {
+            let mut metrica = 0;
+            for i in 1..num_caminhoes {
+                if i < distribuicao.len() {
+                    let diferenca = (calcular_total(&distribuicao[i - 1])
+                        - calcular_total(&distribuicao[i]))
+                    .abs();
+                    metrica += diferenca;
+                }
+            }
+            melhor_metrica = melhor_metrica.min(metrica);
+        }
+
+        // Poda
+        if metrica_atual <= melhor_metrica {
+            let distribuicao_clone = distribuicao_atual.to_vec();
+            melhores_distribuicoes.push(distribuicao_clone);
+        }
+        return;
     }
 
     for &rota in rotas.iter() {
