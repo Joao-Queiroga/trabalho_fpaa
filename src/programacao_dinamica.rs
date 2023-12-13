@@ -1,48 +1,26 @@
-pub fn encontrar_melhor_distribuicao(rotas: &[i32], num_caminhoes: usize) -> Vec<Vec<i32>> {
-    let mut melhor_distribuicao = vec![vec![]; num_caminhoes];
-    let mut melhor_distancia = 0;
+pub fn programacao_dinamica(rotas: &[i32], caminhoes: usize) -> Vec<Vec<i32>> {
+    let mut result: Vec<Vec<i32>> = vec![vec![]; caminhoes];
 
-    fn encontrar_melhor_distribuicao_recursivo(
-        rotas: &[i32],
-        distribuicao_atual: &mut Vec<Vec<i32>>,
-        melhor_distribuicao: &mut Vec<Vec<i32>>,
-        melhor_distancia: &mut i32,
-        caminhao_atual: usize,
-    ) {
-        if rotas.is_empty() {
-            let distancia_total: i32 = distribuicao_atual
-                .iter()
-                .map(|caminhao| caminhao.iter().sum::<i32>())
-                .sum();
+    let mut rotas = rotas.to_vec();
+    rotas.sort();
+    rotas.reverse();
 
-            if *melhor_distancia == 0 || distancia_total < *melhor_distancia {
-                *melhor_distancia = distancia_total;
-                *melhor_distribuicao = distribuicao_atual.clone();
+    let mut soma: Vec<i32> = vec![0; caminhoes];
+
+    for rota in rotas {
+        let mut index = 0;
+        let mut menor = soma[0];
+
+        for i in 1..caminhoes {
+            if soma[i] < menor {
+                menor = soma[i];
+                index = i;
             }
-            return;
         }
 
-        for _ in 0..distribuicao_atual.len() {
-            distribuicao_atual[caminhao_atual].push(rotas[0]);
-            encontrar_melhor_distribuicao_recursivo(
-                &rotas[1..],
-                distribuicao_atual,
-                melhor_distribuicao,
-                melhor_distancia,
-                (caminhao_atual + 1) % distribuicao_atual.len(),
-            );
-            distribuicao_atual[caminhao_atual].pop();
-        }
+        soma[index] += rota;
+        result[index].push(rota);
     }
 
-    let mut distribuicao_atual = vec![vec![]; num_caminhoes];
-    encontrar_melhor_distribuicao_recursivo(
-        rotas,
-        &mut distribuicao_atual,
-        &mut melhor_distribuicao,
-        &mut melhor_distancia,
-        0,
-    );
-
-    melhor_distribuicao
+    result
 }
