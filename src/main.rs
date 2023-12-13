@@ -25,7 +25,12 @@ fn main() {
                 let melhores = backtracking::backtracking(&rotas[0], 3);
                 println!("{melhores:?}");
             }
-            Ok(2) => programacao_dinamica::programacao_dinamica(),
+            Ok(2) => {
+                let rotas = gerador_de_rotas(6, 1, 0.5);
+                println!("{rotas:?}");
+                let melhores = programacao_dinamica::encontrar_melhor_distribuicao(&rotas[0], 3);
+                println!("{melhores:?}");
+            }
             Ok(0) => {
                 println!("Saindo...");
                 break;
