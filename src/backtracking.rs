@@ -8,8 +8,27 @@ pub fn backtracking(rotas: &[i32], n_caminhoes: usize) -> Vec<Vec<i32>> {
         melhor_distribuicao: &mut Vec<Vec<i32>>,
         melhor_distancia: &mut i32,
         caminhao_atual: usize,
+        melhor_diferenca: &mut i32, // Novo parâmetro para controlar a melhor diferença
     ) {
         if rotas.is_empty() {
+            let mut min = std::i32::MAX;
+            let mut max = std::i32::MIN;
+
+            for caminhao in distribuicao_atual.iter() {
+                let distancia = caminhao.iter().sum::<i32>();
+                if distancia < min {
+                    min = distancia;
+                }
+                if distancia > max {
+                    max = distancia;
+                }
+            }
+
+            let diferenca_atual = max - min;
+            if diferenca_atual >= *melhor_diferenca {
+                return; // Podar o ramo atual se a diferença for maior ou igual à melhor encontrada
+            }
+
             let distancia_total: i32 = distribuicao_atual
                 .iter()
                 .map(|caminhao| caminhao.iter().sum::<i32>())
@@ -17,6 +36,7 @@ pub fn backtracking(rotas: &[i32], n_caminhoes: usize) -> Vec<Vec<i32>> {
 
             if *melhor_distancia == 0 || distancia_total < *melhor_distancia {
                 *melhor_distancia = distancia_total;
+                *melhor_diferenca = diferenca_atual; // Atualizar a melhor diferença
                 *melhor_distribuicao = distribuicao_atual.clone();
             }
             return;
@@ -30,18 +50,21 @@ pub fn backtracking(rotas: &[i32], n_caminhoes: usize) -> Vec<Vec<i32>> {
                 melhor_distribuicao,
                 melhor_distancia,
                 (caminhao_atual + 1) % distribuicao_atual.len(),
+                melhor_diferenca, // Passar a referência da melhor diferença para a chamada recursiva
             );
             distribuicao_atual[caminhao_atual].pop();
         }
     }
 
     let mut distribuicao_atual = vec![vec![]; n_caminhoes];
+    let mut melhor_diferenca = std::i32::MAX; // Inicializar a melhor diferença com o maior valor possível
     backtracking_recursivo(
         rotas,
         &mut distribuicao_atual,
         &mut melhor_distribuicao,
         &mut melhor_distancia,
         0,
+        &mut melhor_diferenca,
     );
 
     melhor_distribuicao
