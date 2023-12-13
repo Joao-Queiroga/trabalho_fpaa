@@ -1,7 +1,3 @@
-// Distribui necessariamente todas as rotas, que são os i32 marcando a distancia das rotas, para os caminhões de modo a fazer com que todos os caminhões percorram
-// uma distância igual ou a mais próxima possível usando programação dinâmica, de modo em que
-// todas as rotas sejam designadas a um caminhão mesmo que os caminhões percorram mais de uma rota.
-// O conjunto de rotas é passado como &[i32] em que o valor de cada i32 é a distancia da rota
 pub fn encontrar_melhor_distribuicao(rotas: &[i32], num_caminhoes: usize) -> Vec<Vec<i32>> {
     let mut melhor_distribuicao = vec![vec![]; num_caminhoes];
     let mut melhor_distancia = 0;
