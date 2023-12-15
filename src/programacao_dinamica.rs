@@ -1,9 +1,3 @@
-// Criar um código de programação dinâmica que Distribui necessariamente todas as rotas, que são os i32 marcando a distancia das rotas, para os caminhões de modo a fazer com que todos os caminhões percorram
-// uma distância igual ou a mais próxima possível, de modo em que
-// todas as rotas sejam designadas a um caminhão mesmo que os caminhões percorram mais de uma rota.
-// O conjunto de rotas é passado como &[i32] em que o valor de cada i32 é a distancia da rota
-// O número de caminhões é passado como usize
-// O retorno deve ser um Vec<Vec<i32>> em que cada Vec<i32> representa as rotas designadas a um caminhão
 pub fn programacao_dinamica(rotas: &[i32], n_caminhoes: usize) -> Vec<Vec<i32>> {
     let mut rotas = rotas.to_vec();
     let total: i32 = rotas.iter().sum();
