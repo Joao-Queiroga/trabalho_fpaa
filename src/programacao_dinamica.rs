@@ -42,3 +42,15 @@ pub fn programacao_dinamica(rotas: &[i32], n_caminhoes: usize) -> Vec<Vec<i32>> 
     caminhoes[n_caminhoes - 1].extend(rotas.iter().filter(|&rota| *rota > 0));
     caminhoes
 }
+
+pub fn teste_tempo_t(t: i32) {
+    use super::gerador::gerador_de_rotas;
+    use std::time::Instant;
+    for x in 1..=10 {
+        let rotas = gerador_de_rotas(x * t, 1, 0.5);
+        let inicio = Instant::now();
+        programacao_dinamica(&rotas[0], 3);
+        let duracao = inicio.elapsed();
+        println!("{x}T: {}", duracao.as_secs_f64());
+    }
+}
