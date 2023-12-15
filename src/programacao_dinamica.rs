@@ -29,20 +29,19 @@ pub fn programacao_dinamica(rotas: &[i32], n_caminhoes: usize) -> Vec<Vec<i32>> 
             }
         }
 
-        let melhor_soma = (alvo..=(alvo + margem))
+        let mut melhor_soma = (alvo..=(alvo + margem))
             .find(|&j| pd[n_rotas][j as usize])
             .unwrap_or(0);
 
-        let mut i = n_rotas;
-        let mut j = melhor_soma;
-
-        while i > 0 && j > 0 {
-            if escolhas[i][j as usize] != 0 && rotas[i - 1] != 0 {
+        for i in (1..=n_rotas).rev() {
+            if escolhas[i][melhor_soma as usize] != 0 && rotas[i - 1] != 0 {
                 caminhao.push(rotas[i - 1]);
-                j -= rotas[i - 1];
+                melhor_soma -= rotas[i - 1];
                 rotas[i - 1] = 0;
             }
-            i -= 1;
+            if melhor_soma <= 0 {
+                break;
+            };
         }
     }
 
